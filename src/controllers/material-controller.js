@@ -1,31 +1,41 @@
 import { MaterialModel } from "../models/Material.js";
 import { CategoryModel } from "../models/Category.js";
 import { ObjectId } from "mongoose";
+import { SubcategoryModel } from "../models/Subcategory.js";
 
 export const ctrlCreateMaterial = async (req, res) => {
   try {
-    const { name, precio, moneda, categorias } = req.body;
+    const { name, precio, moneda, category, subcategory } = req.body;
     console.log(name);
     console.log(precio);
     console.log(moneda);
-    console.log(categorias);
+    console.log(category);
+    console.log(subcategory);
 
-    const category = await CategoryModel.findOne({ category: categorias });
-    if (!category) {
+    const categoryExist = await CategoryModel.findOne({ category });
+    if (!categoryExist) {
       return res.status(400).json({ error: "Categoria no encontrada" });
     }
+
+    console.log(categoryExist);
+
+    const subcategoryExist = await SubcategoryModel.findOne({ subcategory });
+    if (!subcategoryExist) {
+      return res.status(400).json({ error: "Subcategoria no encontrada" });
+    }
+
+    console.log(subcategoryExist);
 
     const material = new MaterialModel({
       name,
       precio,
       moneda,
-      categorias: category._id,
+      category: categoryExist._id,
+      subcategory: subcategoryExist._id,
     });
     console.log(material);
 
-    const existingMaterial = await MaterialModel.findOne({
-      name: material.name,
-    });
+    const existingMaterial = await MaterialModel.findOne({ name });
     if (!existingMaterial) {
       const newMaterial = await material.save();
       return res.status(201).json({

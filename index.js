@@ -11,6 +11,7 @@ import { startConnection } from "./src/settings/database.js";
 import { materialRouter } from "./src/routes/material.routes.js";
 import { categoryRouter } from "./src/routes/category.routes.js";
 import { visualRouter } from "./src/routes/visual.routes.js";
+import { subcategoryRouter } from "./src/routes/subcategory.routes.js";
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use("/material", visualRouter)
 app.use("/api/auth", authRouter);
 app.use("/api/material", materialRouter);
 app.use("/api/category", categoryRouter);
+app.use("/api/subcategory", subcategoryRouter);
 
 app.listen(config.port, async () => {
   await startConnection({

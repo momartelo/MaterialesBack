@@ -9,7 +9,7 @@ import {
   createUserValidations,
   loginUserValidations,
 } from "../validations/user-validations.js";
-import { authHeader } from "../validations/auth-validation.js";
+import { authHeader } from "../validations/auth-validations.js";
 
 const authRouter = Router();
 

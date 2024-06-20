@@ -1,5 +1,6 @@
 import { CategoryModel } from "../models/Category.js";
 import { ObjectId } from "mongoose";
+import { SubcategoryModel } from "../models/Subcategory.js";
 
 export const ctrlCreateCategory = async (req, res) => {
   try {
@@ -45,7 +46,7 @@ export const crtlUpdateCategory = async (req, res) => {
   try {
     const category = await CategoryModel.findOne({ _id: categoryId });
     if (!category) {
-      return res.status(404).json({ error: "Categoria no encontrado" });
+      return res.status(404).json({ error: "Categoria no encontrada" });
     }
     category.set(req.body);
     await category.save();
@@ -64,6 +65,9 @@ export const ctrlDeleteCategory = async (req, res) => {
     if (!category) {
       return res.status(404).json({ error: "Categoria no encontrado" });
     }
+
+    await SubcategoryModel.deleteMany({ _id: { $in: category.subcategory } });
+
     await CategoryModel.deleteOne({
       _id: categoryId,
     });

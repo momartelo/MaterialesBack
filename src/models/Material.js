@@ -17,9 +17,14 @@ const MaterialSchema = new Schema(
       required: true,
       enum: ["USD", "EUR", "ARS"],
     },
-    categorias: {
+    category: {
       type: Types.ObjectId,
       ref: "Category",
+      required: true,
+    },
+    subcategory: {
+      type: Types.ObjectId,
+      ref: "Subcategory",
       required: true,
     },
     precioEnPesos: {
@@ -42,6 +47,10 @@ const MaterialSchema = new Schema(
           precio: Number,
           fecha: Date,
           moneda: String,
+          valorDolar: Number,
+          valorEuro: Number,
+          fechaCotizaciones: Date,
+          precioEnDolares: Number,
         },
       ],
       default: [],
@@ -55,6 +64,10 @@ const MaterialSchema = new Schema(
 
 MaterialSchema.pre("save", async function (next) {
   try {
+    let valorDolarHoy = await getCovertExchangePair("USD", "ARS");
+    let valorEuroHoy = await getCovertExchangePair("EUR", "ARS");
+    console.log("valorDolarHoy");
+    console.log(valorDolarHoy);
     if (this.moneda === "USD") {
       const { tipo_cambio: tipoCambioUSDAPesos } = await getCovertExchangePair(
         "USD",
@@ -67,6 +80,14 @@ MaterialSchema.pre("save", async function (next) {
       );
       this.precioEnEuros = this.precio * tipoCambioUSDEUR;
       this.precioEnDolares = this.precio;
+      this.historialPrecio.push({
+        precio: this.precio,
+        fecha: Date.now(),
+        moneda: this.moneda,
+        valorDolar: valorDolarHoy.tipo_cambio,
+        valorEuro: valorEuroHoy.tipo_cambio,
+        fechaCotizaciones: valorDolarHoy.lastUpdate,
+      });
     } else if (this.moneda === "EUR") {
       const { tipo_cambio: tipoCambioEURAPesos } = await getCovertExchangePair(
         "EUR",
@@ -79,6 +100,16 @@ MaterialSchema.pre("save", async function (next) {
       );
       this.precioEnDolares = this.precio * tipoCambioEURUSD;
       this.precioEnEuros = this.precio;
+
+      this.historialPrecio.push({
+        precio: this.precio,
+        fecha: Date.now(),
+        moneda: this.moneda,
+        valorDolar: valorDolarHoy.tipo_cambio,
+        valorEuro: valorEuroHoy.tipo_cambio,
+        fechaCotizaciones: valorDolarHoy.lastUpdate,
+        precioEnDolares: this.precioEnDolares,
+      });
     } else if (this.moneda === "ARS") {
       const { tipo_cambio: tipoCambioUSDAPesos } = await getCovertExchangePair(
         "USD",
@@ -91,13 +122,17 @@ MaterialSchema.pre("save", async function (next) {
       );
       this.precioEnEuros = this.precio / tipoCambioEURAPesos;
       this.precioEnPesos = this.precio;
-    }
 
-    this.historialPrecio.push({
-      precio: this.precio,
-      fecha: Date.now(),
-      moneda: this.moneda,
-    });
+      this.historialPrecio.push({
+        precio: this.precio,
+        fecha: Date.now(),
+        moneda: this.moneda,
+        valorDolar: valorDolarHoy.tipo_cambio,
+        valorEuro: valorEuroHoy.tipo_cambio,
+        fechaCotizaciones: valorDolarHoy.lastUpdate,
+        precioEnDolares: this.precioEnDolares,
+      });
+    }
 
     next();
   } catch (error) {
@@ -107,3 +142,12 @@ MaterialSchema.pre("save", async function (next) {
 });
 
 export const MaterialModel = model("Material", MaterialSchema);
+
+// this.historialPrecio.push({
+//   precio: this.precio,
+//   fecha: Date.now(),
+//   moneda: this.moneda,
+//   valorDolar: valorDolarHoy.tipo_cambio,
+//   valorEuro: valorEuroHoy.tipo_cambio,
+//   fechaCotizaciones: valorDolarHoy.lastUpdate,
+//   precioEnDolares: this.precioEnDolares,
