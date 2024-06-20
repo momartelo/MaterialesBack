@@ -1,6 +1,7 @@
 import { CategoryModel } from "../models/Category.js";
 import { ObjectId } from "mongoose";
 import { SubcategoryModel } from "../models/Subcategory.js";
+import { MaterialModel } from "../models/Material.js";
 
 export const ctrlCreateCategory = async (req, res) => {
   try {
@@ -60,19 +61,88 @@ export const ctrlDeleteCategory = async (req, res) => {
   const { categoryId } = req.params;
 
   try {
-    const category = await CategoryModel.findOne({ _id: categoryId });
+    // Encuentra la categoría por su ID y popula las subcategorías
+    const category = await CategoryModel.findOne({ _id: categoryId }).populate(
+      "subcategories"
+    );
 
+    // Si la categoría no existe, retorna un error 404
     if (!category) {
-      return res.status(404).json({ error: "Categoria no encontrado" });
+      return res.status(404).json({ error: "Categoria no encontrada" });
     }
 
-    await SubcategoryModel.deleteMany({ _id: { $in: category.subcategory } });
+    //Nuevo
+    // Encuentra todas las subcategorías asociadas a la categoría
+    const subcategoryIds = category.subcategories
+      ? category.subcategories.map((subcategory) => subcategory._id)
+      : [];
 
-    await CategoryModel.deleteOne({
-      _id: categoryId,
-    });
-    return res.status(200).json(category);
+    //Nuevo
+    // Elimina todos los materiales asociados a la categoría
+    await MaterialModel.deleteMany({ category: categoryId });
+
+    //Nuevo
+    // Encuentra y elimina todos los materiales asociados a las subcategorías
+    await MaterialModel.deleteMany({ subcategory: { $in: subcategoryIds } });
+
+    //Nuevo
+    // Elimina todas las subcategorías asociadas a la categoría
+    if (subcategoryIds.length > 0) {
+      const deleteResult = await SubcategoryModel.deleteMany({
+        _id: { $in: subcategoryIds },
+      });
+      // Depuración: Muestra el resultado de la eliminación
+      console.log(
+        "Resultado de la eliminación de subcategorías:",
+        deleteResult
+      );
+    }
+
+    // // Elimina todas las subcategorías asociadas a la categoría
+    // const deleteResult = await SubcategoryModel.deleteMany({
+    //   _id: { $in: category.subcategories },
+    // });
+
+    // Elimina la categoría
+    await CategoryModel.deleteOne({ _id: categoryId });
+
+    // Retorna la categoría eliminada
+    return res
+      .status(200)
+      .json({ message: "Categoría y subcategorías eliminadas exitosamente" });
   } catch (error) {
-    return res.status(500).json({ error: "No se puedo conectar con la BBDD" });
+    // Maneja errores de conexión a la base de datos
+    console.error("Error al eliminar la categoría:", error);
+    return res.status(500).json({ error: "No se pudo conectar con la BBDD" });
   }
 };
+
+// export const ctrlDeleteCategory = async (req, res) => {
+//   const { categoryId } = req.params;
+
+//   try {
+//     const category = await CategoryModel.findOne({ _id: categoryId }).populate(
+//       "subcategories"
+//     );
+
+//     if (!category) {
+//       return res.status(404).json({ error: "Categoria no encontrado" });
+//     }
+
+//     console.log("Subcategorías encontradas:", category.subcategories);
+
+//     const deleteResult = await SubcategoryModel.deleteMany({
+//       _id: { $in: category.subcategories },
+//     });
+
+//     // Depuración: Muestra el resultado de la eliminación
+//     console.log("Resultado de la eliminación de subcategorías:", deleteResult);
+
+//     await CategoryModel.deleteOne({
+//       _id: categoryId,
+//     });
+//     return res.status(200).json(category);
+//   } catch (error) {
+//     return res.status(500).json({ error: "No se puedo conectar con la BBDD" });
+//   }
+// };

@@ -1,6 +1,6 @@
 import { SubcategoryModel } from "../models/Subcategory.js";
 import { validationResult } from "express-validator";
-import { ObjectId } from "mongoose";
+import { Types } from "mongoose";
 import { CategoryModel } from "../models/Category.js";
 
 export const ctrlCreateSubcategory = async (req, res) => {
@@ -13,9 +13,7 @@ export const ctrlCreateSubcategory = async (req, res) => {
     const { subcategory, category, material } = req.body;
 
     // Verifica si la categoría existe por nombre
-    const existingCategory = await CategoryModel.findOne({
-      category: category,
-    });
+    const existingCategory = await CategoryModel.findOne({ category });
     if (!existingCategory) {
       return res.status(400).json({ error: "La categoría no existe" });
     }
@@ -35,6 +33,10 @@ export const ctrlCreateSubcategory = async (req, res) => {
       material,
     });
     await newSubcategory.save();
+
+    // Agrega la nueva subcategoría al array de subcategorías de la categoría
+    existingCategory.subcategories.push(newSubcategory._id);
+    await existingCategory.save();
 
     res
       .status(201)
@@ -72,9 +74,7 @@ export const ctrlUpdateSubcategory = async (req, res) => {
     // Verifica si la categoría existe por nombre
     let categoryObjectId = undefined;
     if (category) {
-      const existingCategory = await CategoryModel.findOne({
-        category: category,
-      });
+      const existingCategory = await CategoryModel.findOne({ category });
       if (!existingCategory) {
         return res.status(400).json({ error: "La categoría no existe" });
       }
