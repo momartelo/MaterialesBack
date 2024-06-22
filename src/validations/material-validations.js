@@ -24,6 +24,11 @@ export const createMaterialValidations = [
     .withMessage("El campo { moneda } no puede estar vacio")
     .isString()
     .withMessage("El campo { moneda } debe ser ARS, EUR o USD"),
+  body("unidad")
+    .notEmpty()
+    .withMessage("El campo { unidad } no puede estar vacio")
+    .isString()
+    .withMessage("El campo { unidad } debe ser un string"),
   applyValidations,
 ];
 
@@ -71,6 +76,10 @@ export const updateMaterialValidations = [
       }
       return true;
     }),
+  body("unidad")
+    .optional()
+    .isString()
+    .withMessage("El parametro { unidad } debe ser un string."),
   applyValidations,
 ];
 

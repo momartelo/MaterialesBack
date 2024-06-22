@@ -17,6 +17,10 @@ const MaterialSchema = new Schema(
       required: true,
       enum: ["USD", "EUR", "ARS"],
     },
+    unidad: {
+      type: Types.ObjectId,
+      ref: "Unit",
+    },
     category: {
       type: Types.ObjectId,
       ref: "Category",

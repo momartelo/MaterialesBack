@@ -10,8 +10,8 @@ import { authRouter } from "./src/routes/auth.routes.js";
 import { startConnection } from "./src/settings/database.js";
 import { materialRouter } from "./src/routes/material.routes.js";
 import { categoryRouter } from "./src/routes/category.routes.js";
-import { visualRouter } from "./src/routes/visual.routes.js";
 import { subcategoryRouter } from "./src/routes/subcategory.routes.js";
+import { unitRouter } from "./src/routes/unit.routes.js";
 
 const app = express();
 
@@ -33,18 +33,12 @@ const __dirname = path.dirname(__filename);
 const publicPath = path.join(__dirname, "src", "public");
 app.use(express.static(publicPath));
 
-
-//---------Rutas visualizacion-----//
-app.use("/material", visualRouter)
-
-
-
-
 //---------Rutas api-----------//
 app.use("/api/auth", authRouter);
 app.use("/api/material", materialRouter);
 app.use("/api/category", categoryRouter);
 app.use("/api/subcategory", subcategoryRouter);
+app.use("/api/unit", unitRouter);
 
 app.listen(config.port, async () => {
   await startConnection({

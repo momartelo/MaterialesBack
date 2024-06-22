@@ -5,12 +5,13 @@ import { SubcategoryModel } from "../models/Subcategory.js";
 
 export const ctrlCreateMaterial = async (req, res) => {
   try {
-    const { name, precio, moneda, category, subcategory } = req.body;
+    const { name, precio, moneda, category, subcategory, unidad } = req.body;
     console.log(name);
     console.log(precio);
     console.log(moneda);
     console.log(category);
     console.log(subcategory);
+    console.log(unidad);
 
     const categoryExist = await CategoryModel.findOne({ category });
     if (!categoryExist) {
@@ -30,6 +31,7 @@ export const ctrlCreateMaterial = async (req, res) => {
       name,
       precio,
       moneda,
+      unidad,
       category: categoryExist._id,
       subcategory: subcategoryExist._id,
     });
