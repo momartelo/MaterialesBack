@@ -3,17 +3,37 @@ import {
   ctrlCreateMaterial,
   ctrlDeleteMaterial,
   ctrlGetMaterial,
+  ctrlGetMaterialsByCategory,
   ctrlListAllMaterials,
   ctrlUpdateMaterial,
 } from "../controllers/material-controller.js";
-import { createMaterialValidations, deleteMaterialValidations, getMaterialValidations, updateMaterialValidations } from "../validations/material-validations.js";
+import {
+  createMaterialValidations,
+  deleteMaterialValidations,
+  getMaterialsByCategoryValidations,
+  getMaterialValidations,
+  updateMaterialValidations,
+} from "../validations/material-validations.js";
 
 const materialRouter = Router();
 
 materialRouter.get("/", ctrlListAllMaterials);
-materialRouter.get("/:materialId", getMaterialValidations, ctrlGetMaterial);
-materialRouter.post("/new", createMaterialValidations ,ctrlCreateMaterial);
-materialRouter.patch("/:materialId", updateMaterialValidations ,ctrlUpdateMaterial);
-materialRouter.delete("/:materialId",  deleteMaterialValidations ,ctrlDeleteMaterial);
+materialRouter.get("/get/:materialId", getMaterialValidations, ctrlGetMaterial);
+materialRouter.get(
+  "/by/:categoryId",
+  getMaterialsByCategoryValidations,
+  ctrlGetMaterialsByCategory
+);
+materialRouter.post("/new", createMaterialValidations, ctrlCreateMaterial);
+materialRouter.patch(
+  "/:materialId",
+  updateMaterialValidations,
+  ctrlUpdateMaterial
+);
+materialRouter.delete(
+  "/:materialId",
+  deleteMaterialValidations,
+  ctrlDeleteMaterial
+);
 
 export { materialRouter };

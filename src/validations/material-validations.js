@@ -24,11 +24,11 @@ export const createMaterialValidations = [
     .withMessage("El campo { moneda } no puede estar vacio")
     .isString()
     .withMessage("El campo { moneda } debe ser ARS, EUR o USD"),
-  body("unidad")
+  body("unit")
     .notEmpty()
-    .withMessage("El campo { unidad } no puede estar vacio")
+    .withMessage("El campo { unit } no puede estar vacio")
     .isString()
-    .withMessage("El campo { unidad } debe ser un string"),
+    .withMessage("El campo { unit } debe ser un string"),
   applyValidations,
 ];
 
@@ -91,5 +91,16 @@ export const deleteMaterialValidations = [
     .withMessage("El parametro { materialId } debe ser un string.")
     .custom(isValidObjectId)
     .withMessage("El parametro { materialId } debe ser una id valida."),
+  applyValidations,
+];
+
+export const getMaterialsByCategoryValidations = [
+  param("categoryId")
+    .notEmpty()
+    .withMessage("El parametro { categoryId } no debe estar vacio.")
+    .isString()
+    .withMessage("El parametro { categoryId } debe ser un string.")
+    .custom(isValidObjectId)
+    .withMessage("El parametro { categoryId } debe ser una id valida."),
   applyValidations,
 ];

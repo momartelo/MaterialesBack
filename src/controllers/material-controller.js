@@ -2,16 +2,17 @@ import { MaterialModel } from "../models/Material.js";
 import { CategoryModel } from "../models/Category.js";
 import { ObjectId } from "mongoose";
 import { SubcategoryModel } from "../models/Subcategory.js";
+import { UnitModel } from "../models/Unit.js";
 
 export const ctrlCreateMaterial = async (req, res) => {
   try {
-    const { name, precio, moneda, category, subcategory, unidad } = req.body;
+    const { name, precio, moneda, category, subcategory, unit } = req.body;
     console.log(name);
     console.log(precio);
     console.log(moneda);
     console.log(category);
     console.log(subcategory);
-    console.log(unidad);
+    console.log(unit);
 
     const categoryExist = await CategoryModel.findOne({ category });
     if (!categoryExist) {
@@ -27,13 +28,20 @@ export const ctrlCreateMaterial = async (req, res) => {
 
     console.log(subcategoryExist);
 
+    const unitExist = await UnitModel.findOne({ unit });
+    if (!unitExist) {
+      return res.status(400).json({ error: "Unidad no encontrada" });
+    }
+
+    console.log(unitExist);
+
     const material = new MaterialModel({
       name,
       precio,
       moneda,
-      unidad,
       category: categoryExist._id,
       subcategory: subcategoryExist._id,
+      unit: unitExist._id,
     });
     console.log(material);
 
@@ -73,11 +81,12 @@ export const ctrlListAllMaterials = async (req, res) => {
 };
 
 export const ctrlGetMaterial = async (req, res) => {
-  const { idParams } = req.params.materialId;
-  try {
-    const objectId = new ObjectId(idParams);
-    const material = await MaterialModel.findById(objectId);
+  const { materialId } = req.params;
+  console.log(materialId);
 
+  try {
+    const material = await MaterialModel.findOne({ _id: materialId }); //si no funciona poner directamente el params
+    console.log(material);
     if (!material) {
       return res.status(404).json({ error: "Material no encontrado" });
     }
@@ -95,7 +104,13 @@ export const ctrlUpdateMaterial = async (req, res) => {
     if (!material) {
       return res.status(404).json({ error: "Material no encontrado" });
     }
-    material.set(req.body);
+
+    const updatedFields = req.body;
+    for (const field in updatedFields) {
+      material.set(field, updatedFields[field]); // version para actualizar solo los campos modificados
+    }
+
+    // material.set(req.body); // version anterior
     await material.save();
     return res.status(200).json(material);
   } catch (error) {
@@ -113,7 +128,29 @@ export const ctrlDeleteMaterial = async (req, res) => {
     await MaterialModel.deleteOne({
       _id: materialId,
     });
-    return res.status(200).json(material);
+    return res.status(200).json({ material, message: "Material eliminado" }); //modificado revisar
+  } catch (error) {
+    return res.status(500).json({ error: "No se puedo conectar con la BBDD" });
+  }
+};
+
+//-----------------Filtrar por categoria-----------------//
+
+export const ctrlGetMaterialsByCategory = async (req, res) => {
+  const { categoryId } = req.params;
+  console.log(categoryId);
+  try {
+    // const objectId = new ObjectId(idParams);
+    const materialsFiltered = await MaterialModel.find({
+      category: categoryId,
+    });
+
+    if (!materialsFiltered) {
+      return res
+        .status(404)
+        .json({ error: "No hay materiales dentro de la categoria" });
+    }
+    return res.status(200).json(materialsFiltered);
   } catch (error) {
     return res.status(500).json({ error: "No se puedo conectar con la BBDD" });
   }
