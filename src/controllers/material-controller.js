@@ -155,3 +155,30 @@ export const ctrlGetMaterialsByCategory = async (req, res) => {
     return res.status(500).json({ error: "No se puedo conectar con la BBDD" });
   }
 };
+
+//-----------------Filtrar por categoria y subcategoria-----------------//
+
+export const ctrlGetMaterialByCategoryAndSubcategory = async (req, res) => {
+  try {
+    const { categoryId, subcategoryId } = req.params;
+
+    const category = await CategoryModel.findById({ _id: categoryId });
+    const subcategory = await SubcategoryModel.findById({ _id: subcategoryId });
+
+    if (!category) {
+      return res.status(404).json({ message: "Categoria no encontrada" });
+    }
+    if (!subcategory) {
+      return res.status(404).json({ message: "Subcategoria no encontrada" });
+    }
+
+    const materials = await MaterialModel.find({
+      category: categoryId,
+      subcategory: subcategoryId,
+    });
+
+    res.status(200).json(materials);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching materials", error });
+  }
+};

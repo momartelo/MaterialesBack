@@ -3,6 +3,7 @@ import {
   ctrlCreateMaterial,
   ctrlDeleteMaterial,
   ctrlGetMaterial,
+  ctrlGetMaterialByCategoryAndSubcategory,
   ctrlGetMaterialsByCategory,
   ctrlListAllMaterials,
   ctrlUpdateMaterial,
@@ -23,6 +24,10 @@ materialRouter.get(
   "/by/:categoryId",
   getMaterialsByCategoryValidations,
   ctrlGetMaterialsByCategory
+);
+materialRouter.get(
+  "/cat/:categoryId/:subcategoryId",
+  ctrlGetMaterialByCategoryAndSubcategory
 );
 materialRouter.post("/new", createMaterialValidations, ctrlCreateMaterial);
 materialRouter.patch(
