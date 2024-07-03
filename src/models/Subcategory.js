@@ -4,7 +4,6 @@ const SubcategorySchema = new Schema({
   subcategory: {
     type: String,
     required: true,
-    unique: true,
   },
   category: {
     type: Types.ObjectId,
@@ -18,9 +17,11 @@ const SubcategorySchema = new Schema({
   slug: {
     type: String,
     lowercase: true,
-    unique: true,
+
   },
 });
+
+SubcategorySchema.index({ subcategory: 1, category: 1 }, { unique: true });
 
 SubcategorySchema.pre("save", function (next) {
   const slug = this.subcategory.replace(/\s+/g, "-").toLowerCase();

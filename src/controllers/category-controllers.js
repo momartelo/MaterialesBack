@@ -109,7 +109,7 @@ export const ctrlDeleteCategory = async (req, res) => {
     // Retorna la categoría eliminada
     return res
       .status(200)
-      .json({ message: "Categoría y subcategorías eliminadas exitosamente" });
+      .json({ message: "Categoría eliminada exitosamente" });
   } catch (error) {
     // Maneja errores de conexión a la base de datos
     console.error("Error al eliminar la categoría:", error);

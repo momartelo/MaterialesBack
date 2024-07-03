@@ -2,6 +2,7 @@ import { body, header, param } from "express-validator";
 import { isValidObjectId } from "mongoose";
 import { applyValidations } from "../middlewares/apply-validations.js";
 import { SubcategoryModel } from "../models/Subcategory.js";
+import { CategoryModel } from "../models/Category.js";
 
 export const createSubcategoryValidations = [
   body("subcategory")
@@ -9,13 +10,20 @@ export const createSubcategoryValidations = [
     .withMessage("El campo { subcategory } no puede estar vacio")
     .isString()
     .withMessage("El campo { subcategory } debe ser un string")
-    .custom(async (value) => {
-      const subCategoryExist = await SubcategoryModel.findOne({
-        subcategory: value,
-      });
-      if (subCategoryExist) throw new Error("La subcategoria ya esta creada");
-      return true;
-    }),
+    // .custom(async (value) => {
+    //   const subCategoryExist = await SubcategoryModel.findOne({
+    //     subcategory: value,
+    //   });
+    //   const categoryExist = await CategoryModel.findOne({
+    //     category: value,
+    //   });
+      
+    //   if (subCategoryExist && categoryExist) throw new Error("La subcategoria ya esta creada");
+    //   return true;
+           
+
+    // })
+    ,
   body("category")
     .notEmpty()
     .withMessage("El campo { category } no puede estar vacio")
