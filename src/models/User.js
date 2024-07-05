@@ -4,17 +4,23 @@ import {
   isValidEmail,
   isValidPassword,
 } from "../validations/user-validations.js";
+import { publicPath } from "../../index.js";
 
 const UserSchema = new Schema(
   {
     avatar: {
       type: String,
-      required: true,
+      default: ''
     },
     username: {
       type: String,
       required: true,
       unique: true,
+    },
+    genero: {
+      type: String,
+      required: true,
+      enum: ["MASC", "FEM", "NO-BIN"],
     },
     email: {
       type: String,
@@ -46,6 +52,14 @@ const UserSchema = new Schema(
 
 UserSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
+
+  if (this.genero === "MASC") {
+    this.avatar = `${publicPath}/img/avatar-hombre.png`;
+  } else if (this.genero === "FEM") {
+    this.avatar = '/img/avatar-mujer.png'; 
+  } else if (this.genero === "NO-BIN") {
+    this.avatar = '/img/avatar-no-binario.png'; 
+  }
 
   const hash = await bcrypt.hash(this.password, 10);
   this.password = hash;

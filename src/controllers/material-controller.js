@@ -6,7 +6,8 @@ import { UnitModel } from "../models/Unit.js";
 
 export const ctrlCreateMaterial = async (req, res) => {
   try {
-    const { name, precio, moneda, category, subcategory, unit } = req.body;
+    const { image, name, precio, moneda, category, subcategory, unit } = req.body;
+    console.log(image)
     console.log(name);
     console.log(precio);
     console.log(moneda);
@@ -36,6 +37,7 @@ export const ctrlCreateMaterial = async (req, res) => {
     console.log(unitExist);
 
     const material = new MaterialModel({
+      image,
       name,
       precio,
       moneda,
