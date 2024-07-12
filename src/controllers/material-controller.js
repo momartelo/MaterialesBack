@@ -19,21 +19,21 @@ export const ctrlCreateMaterial = async (req, res) => {
     if (!categoryExist) {
       return res.status(400).json({ error: "Categoria no encontrada" });
     }
-
+    console.log("Categoria")
     console.log(categoryExist);
 
-    const subcategoryExist = await SubcategoryModel.findOne({ subcategory });
+    const subcategoryExist = await SubcategoryModel.findOne({ category: categoryExist, subcategory });
     if (!subcategoryExist) {
       return res.status(400).json({ error: "Subcategoria no encontrada" });
     }
-
+    console.log("Subcategoria")
     console.log(subcategoryExist);
 
     const unitExist = await UnitModel.findOne({ unit });
     if (!unitExist) {
       return res.status(400).json({ error: "Unidad no encontrada" });
     }
-
+    console.log("Unidad")
     console.log(unitExist);
 
     const material = new MaterialModel({
