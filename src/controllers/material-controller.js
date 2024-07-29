@@ -6,8 +6,9 @@ import { UnitModel } from "../models/Unit.js";
 
 export const ctrlCreateMaterial = async (req, res) => {
   try {
-    const { image, name, precio, moneda, category, subcategory, unit } = req.body;
-    console.log(image)
+    const { image, name, precio, moneda, category, subcategory, unit } =
+      req.body;
+    console.log(image);
     console.log(name);
     console.log(precio);
     console.log(moneda);
@@ -19,21 +20,24 @@ export const ctrlCreateMaterial = async (req, res) => {
     if (!categoryExist) {
       return res.status(400).json({ error: "Categoria no encontrada" });
     }
-    console.log("Categoria")
+    console.log("Categoria");
     console.log(categoryExist);
 
-    const subcategoryExist = await SubcategoryModel.findOne({ category: categoryExist, subcategory });
+    const subcategoryExist = await SubcategoryModel.findOne({
+      category: categoryExist,
+      subcategory,
+    });
     if (!subcategoryExist) {
       return res.status(400).json({ error: "Subcategoria no encontrada" });
     }
-    console.log("Subcategoria")
+    console.log("Subcategoria");
     console.log(subcategoryExist);
 
     const unitExist = await UnitModel.findOne({ unit });
     if (!unitExist) {
       return res.status(400).json({ error: "Unidad no encontrada" });
     }
-    console.log("Unidad")
+    console.log("Unidad");
     console.log(unitExist);
 
     const material = new MaterialModel({
@@ -98,9 +102,39 @@ export const ctrlGetMaterial = async (req, res) => {
   }
 };
 
+// export const ctrlUpdateMaterial = async (req, res) => {
+//   const { materialId } = req.params;
+//   console.log(materialId);
+//   try {
+//     const material = await MaterialModel.findOne({ _id: materialId });
+//     console.log(material);
+//     if (!material) {
+//       return res.status(404).json({ error: "Material no encontrado" });
+//     }
+
+//     const updatedFields = req.body;
+//     for (const field in updatedFields) {
+//       console.log("Campo", field);
+//       material.set(field, updatedFields[field]); // version para actualizar solo los campos modificados
+//     }
+
+//     console.log("updateFields", updatedFields);
+
+//     // const newMaterial = req.body;
+//     // console.log("new material", newMaterial)
+
+//     // material.set(req.body); // version anterior
+//     console.log(material);
+//     await material.save();
+//     return res.status(200).json(material);
+//   } catch (error) {
+//     return res.status(500).json({ error: "No se puedo conectar con la BBDD" });
+//   }
+// };
+
 export const ctrlUpdateMaterial = async (req, res) => {
   const { materialId } = req.params;
-  console.log(materialId);
+
   try {
     const material = await MaterialModel.findOne({ _id: materialId });
     if (!material) {
@@ -108,15 +142,55 @@ export const ctrlUpdateMaterial = async (req, res) => {
     }
 
     const updatedFields = req.body;
-    for (const field in updatedFields) {
-      material.set(field, updatedFields[field]); // version para actualizar solo los campos modificados
+
+    console.log(updatedFields)
+
+    let category;
+    // Verifica si se proporciona el nombre de la categoría
+    if (updatedFields.category) {
+      category = await CategoryModel.findOne({
+        category: updatedFields.category,
+      });
+      if (!category) {
+        return res.status(404).json({ error: "Categoría no encontrada" });
+      }
+      // Reemplaza el nombre de la categoría con el ID de la categoría
+      updatedFields.category = category._id;
     }
 
-    // material.set(req.body); // version anterior
+    // Verifica si se proporciona el nombre de la unidad
+    if (updatedFields.unit) {
+      const unit = await UnitModel.findOne({ unit: updatedFields.unit });
+      if (!unit) {
+        return res.status(404).json({ error: "Unidad no encontrada" });
+      }
+      // Reemplaza el nombre de la unidad con el ID de la unidad
+      updatedFields.unit = unit._id;
+    }
+
+    // Verifica si se proporciona el nombre de la subcategoría
+    if (updatedFields.subcategory) {
+      const subcategory = await SubcategoryModel.findOne({
+        subcategory: updatedFields.subcategory,
+        category: category._id,
+      });
+      if (!subcategory) {
+        return res.status(404).json({
+          error: "Subcategoría no encontrada o no asociada a la categoría",
+        });
+      }
+      // Reemplaza el nombre de la subcategoría con el ID de la subcategoría
+      updatedFields.subcategory = subcategory._id;
+    }
+
+    for (const field in updatedFields) {
+      material.set(field, updatedFields[field]);
+    }
+
     await material.save();
     return res.status(200).json(material);
   } catch (error) {
-    return res.status(500).json({ error: "No se puedo conectar con la BBDD" });
+    return res.status(500).json({ error: "No se pudo conectar con la BBDD" });
   }
 };
 

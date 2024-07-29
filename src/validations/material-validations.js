@@ -59,17 +59,19 @@ export const updateMaterialValidations = [
     .optional()
     .isString()
     .withMessage("El campo { image } debe ser un string"),
-  body("name")
+    body("name")
     .optional()
     .isString()
     .withMessage("El parametro { name } debe ser un string.")
-    .custom(async (value) => {
+    .custom(async (value, { req }) => {
       if (value) {
         const material = await MaterialModel.findOne({ name: value });
-        if (material) throw new Error("El material ya esta en creado");
+        if (material && material._id.toString() !== req.params.materialId) {
+          throw new Error("El material ya está creado");
+        }
       }
       return true;
-    }),
+    }),  
   body("precio")
     .optional()
     .isFloat()
