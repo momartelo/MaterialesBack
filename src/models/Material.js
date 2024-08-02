@@ -5,7 +5,7 @@ const MaterialSchema = new Schema(
   {
     image: {
       type: String,
-      default: "/img/no-fotosColor.png"
+      default: "/img/no-fotosColor.png",
     },
     name: {
       type: String,
@@ -98,20 +98,32 @@ MaterialSchema.pre("save", async function (next) {
 
     // Calcular precios en diferentes monedas
     if (this.moneda === "USD") {
-      const { tipo_cambio: tipoCambioUSDAPesos } = await getCovertExchangePair("USD", "ARS");
+      const { tipo_cambio: tipoCambioUSDAPesos } = await getCovertExchangePair(
+        "USD",
+        "ARS"
+      );
       this.precioEnPesos = this.precio * tipoCambioUSDAPesos;
       this.precioEnDolares = this.precio;
-      this.precioEnEuros = this.precio * (await getCovertExchangePair("USD", "EUR")).tipo_cambio;
+      this.precioEnEuros =
+        this.precio * (await getCovertExchangePair("USD", "EUR")).tipo_cambio;
     } else if (this.moneda === "EUR") {
-      const { tipo_cambio: tipoCambioEURAPesos } = await getCovertExchangePair("EUR", "ARS");
+      const { tipo_cambio: tipoCambioEURAPesos } = await getCovertExchangePair(
+        "EUR",
+        "ARS"
+      );
       this.precioEnPesos = this.precio * tipoCambioEURAPesos;
-      this.precioEnDolares = this.precio * (await getCovertExchangePair("EUR", "USD")).tipo_cambio;
+      this.precioEnDolares =
+        this.precio * (await getCovertExchangePair("EUR", "USD")).tipo_cambio;
       this.precioEnEuros = this.precio;
     } else if (this.moneda === "ARS") {
-      const { tipo_cambio: tipoCambioUSDAPesos } = await getCovertExchangePair("USD", "ARS");
+      const { tipo_cambio: tipoCambioUSDAPesos } = await getCovertExchangePair(
+        "USD",
+        "ARS"
+      );
       this.precioEnPesos = this.precio;
       this.precioEnDolares = this.precio / tipoCambioUSDAPesos;
-      this.precioEnEuros = this.precio / (await getCovertExchangePair("EUR", "ARS")).tipo_cambio;
+      this.precioEnEuros =
+        this.precio / (await getCovertExchangePair("EUR", "ARS")).tipo_cambio;
     }
 
     // Asignar los precios calculados al objeto actual
@@ -142,10 +154,7 @@ MaterialSchema.pre("save", async function (next) {
   }
 });
 
-
-
 export const MaterialModel = model("Material", MaterialSchema);
-
 
 // import { Schema, model, Types } from "mongoose";
 // import { getCovertExchangePair } from "../functions/fetchs.js";
@@ -318,9 +327,6 @@ export const MaterialModel = model("Material", MaterialSchema);
 
 // export const MaterialModel = model("Material", MaterialSchema);
 
-
-
-
 // import { Schema, model, Types } from "mongoose";
 // import { getCovertExchangePair } from "../functions/fetchs.js";
 
@@ -472,5 +478,3 @@ export const MaterialModel = model("Material", MaterialSchema);
 // });
 
 // export const MaterialModel = model("Material", MaterialSchema);
-
-
