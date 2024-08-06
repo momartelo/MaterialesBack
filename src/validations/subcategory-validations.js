@@ -43,14 +43,14 @@ export const updateSubcategoryValidations = [
   body("subcategory")
     .optional()
     .isString()
-    .withMessage("El campo { subcategory } debe ser un string")
-    .custom(async (value) => {
-      const subCategoryExist = await SubcategoryModel.findOne({
-        subcategory: value,
-      });
-      if (subCategoryExist) throw new Error("La subcategoria ya esta creada");
-      return true;
-    }),
+    .withMessage("El campo { subcategory } debe ser un string"),
+    // .custom(async (value) => {
+    //   const subCategoryExist = await SubcategoryModel.findOne({
+    //     subcategory: value,
+    //   });
+    //   if (subCategoryExist) throw new Error("La subcategoria ya esta creada");
+    //   return true;
+    // }),
   body("category")
     .optional()
     .isString()

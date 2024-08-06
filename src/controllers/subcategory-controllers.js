@@ -77,7 +77,7 @@ export const ctrlListAllSubcategories = async (req, res) => {
 export const ctrlUpdateSubcategory = async (req, res) => {
   const { subcategoryId } = req.params;
   try {
-    const { subcategory: newSubcategory, category, material } = req.body;
+    const { subcategory: newSubcategory, category /*, material*/ } = req.body;
 
     // Verifica si la categoría existe por nombre
     let categoryObjectId = undefined;
@@ -102,9 +102,9 @@ export const ctrlUpdateSubcategory = async (req, res) => {
     if (categoryObjectId) {
       subcategory.category = categoryObjectId;
     }
-    if (material) {
-      subcategory.material = material;
-    }
+    // if (material) {
+    //   subcategory.material = material;
+    // }
 
     await subcategory.save();
     return res.status(200).json(subcategory);
