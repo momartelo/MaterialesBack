@@ -1,3 +1,4 @@
+import e from "cors";
 import { validationResult } from "express-validator";
 import { UnitModel } from "../models/Unit.js";
 
@@ -31,13 +32,13 @@ export const ctrlCreateUnit = async (req, res) => {
 export const ctrlListAllUnits = async (req, res) => {
   try {
     const allUnits = await UnitModel.find();
+
     if (allUnits.length === 0) {
-      res
-        .status(404)
-        .json({ error: "No hay unidades creadas en la base de datos" });
+      return res.status(200).json([]);
     }
     return res.status(200).json(allUnits);
   } catch (error) {
+    console.error(error);
     return res
       .status(500)
       .json({ error: "No se puedo conectar con la base de datos" });
