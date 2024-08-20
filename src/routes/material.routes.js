@@ -8,6 +8,7 @@ import {
   ctrlListAllMaterials,
   ctrlUpdateMaterial,
 } from "../controllers/material-controller.js";
+import { validateToken } from "../middlewares/validate-token.js";
 import {
   createMaterialValidations,
   deleteMaterialValidations,
@@ -29,9 +30,15 @@ materialRouter.get(
   "/cat/:categoryId/:subcategoryId",
   ctrlGetMaterialByCategoryAndSubcategory
 );
-materialRouter.post("/new", createMaterialValidations, ctrlCreateMaterial);
+materialRouter.post(
+  "/new",
+  validateToken,
+  createMaterialValidations,
+  ctrlCreateMaterial
+);
 materialRouter.patch(
   "/:materialId",
+  validateToken,
   updateMaterialValidations,
   ctrlUpdateMaterial
 );

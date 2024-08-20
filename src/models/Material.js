@@ -21,6 +21,9 @@ const MaterialSchema = new Schema(
       required: true,
       enum: ["USD", "EUR", "ARS"],
     },
+    fuente: {
+      type: String,
+    },
     unit: {
       type: Types.ObjectId,
       ref: "Unit",
@@ -36,6 +39,11 @@ const MaterialSchema = new Schema(
       type: Types.ObjectId,
       ref: "Subcategory",
       required: true,
+    },
+
+    created: {
+      type: Types.ObjectId,
+      ref: "User",
     },
 
     precioEnPesos: {

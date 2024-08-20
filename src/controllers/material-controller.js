@@ -6,12 +6,15 @@ import { UnitModel } from "../models/Unit.js";
 
 export const ctrlCreateMaterial = async (req, res) => {
   try {
-    const { image, name, precio, moneda, category, subcategory, unit } =
+    const userId = req.user._id;
+
+    const { image, name, precio, moneda, fuente, category, subcategory, unit } =
       req.body;
     console.log(image);
     console.log(name);
     console.log(precio);
     console.log(moneda);
+    console.log(fuente);
     console.log(category);
     console.log(subcategory);
     console.log(unit);
@@ -45,9 +48,11 @@ export const ctrlCreateMaterial = async (req, res) => {
       name,
       precio,
       moneda,
+      fuente,
       category: categoryExist._id,
       subcategory: subcategoryExist._id,
       unit: unitExist._id,
+      created: userId,
     });
     console.log(material);
 
@@ -134,6 +139,7 @@ export const ctrlGetMaterial = async (req, res) => {
 
 export const ctrlUpdateMaterial = async (req, res) => {
   const { materialId } = req.params;
+  const userId = req.user._id;
 
   try {
     const material = await MaterialModel.findOne({ _id: materialId });
@@ -143,7 +149,7 @@ export const ctrlUpdateMaterial = async (req, res) => {
 
     const updatedFields = req.body;
 
-    console.log(updatedFields)
+    console.log(updatedFields);
 
     let category;
     // Verifica si se proporciona el nombre de la categoría
@@ -186,7 +192,7 @@ export const ctrlUpdateMaterial = async (req, res) => {
     for (const field in updatedFields) {
       material.set(field, updatedFields[field]);
     }
-
+    material.created = userId;
     await material.save();
     return res.status(200).json(material);
   } catch (error) {
