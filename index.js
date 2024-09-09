@@ -13,6 +13,7 @@ import { categoryRouter } from "./src/routes/category.routes.js";
 import { subcategoryRouter } from "./src/routes/subcategory.routes.js";
 import { unitRouter } from "./src/routes/unit.routes.js";
 import { avatarsRouter } from "./src/routes/avatars.routes.js";
+import { emailRouter } from "./src/routes/email.routes.js";
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.use("/api/category", categoryRouter);
 app.use("/api/subcategory", subcategoryRouter);
 app.use("/api/unit", unitRouter);
 app.use("/api/avatars", avatarsRouter);
+app.use("/api/email", emailRouter);
 
 app.listen(config.port, async () => {
   await startConnection({
