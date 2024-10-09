@@ -82,3 +82,65 @@ export const getCovertExchangePair = async (moneda_origen, moneda_final) => {
     throw new Error("Error al obtener el tipo de cambio");
   }
 };
+
+//---------------------------------------------------------------
+
+export const getDolarRateDolarApi = async () => {
+  const api_URL = `https://dolarapi.com/v1/dolares`;
+  try {
+    const response = await axios.get(api_URL);
+    console.log(response);
+    if (!Array.isArray(response.data)) {
+      throw new Error("La respuesta de la API no es un array.");
+    }
+    const dolarOficial = response.data.find((d) => d.nombre === "Oficial");
+    const dolarBlue = response.data.find((d) => d.nombre === "Blue");
+    if (!dolarOficial || !dolarBlue) {
+      throw new Error(
+        "No se encontraron los valores del dólar Oficial o Blue."
+      );
+    }
+    console.log("Dolar Oficial");
+    console.log(dolarOficial);
+    return { dolarBlue, dolarOficial };
+  } catch (error) {
+    if (error.response) {
+      // El servidor respondió con un código de estado que está fuera del rango de 2xx
+      console.error("Error status:", error.response.status);
+      console.error("Error data:", error.response.data);
+      console.error("Error headers:", error.response.headers);
+    } else if (error.request) {
+      // La solicitud fue hecha pero no se recibió respuesta
+      console.error("Error request:", error.request);
+    } else {
+      // Algo sucedió al configurar la solicitud
+      console.error("Error message:", error.message);
+    }
+    throw new Error("Error al obtener los tipos de cambio");
+  }
+};
+
+//----------------------------------------------------------------
+
+export const getEuroRateDolarApi = async () => {
+  const api_URL = `https://dolarapi.com/v1/cotizaciones/eur`;
+  try {
+    const response = await axios.get(api_URL);
+    const euroOficial = response.data;
+    return { euroOficial };
+  } catch (error) {
+    if (error.response) {
+      // El servidor respondió con un código de estado que está fuera del rango de 2xx
+      console.error("Error status:", error.response.status);
+      console.error("Error data:", error.response.data);
+      console.error("Error headers:", error.response.headers);
+    } else if (error.request) {
+      // La solicitud fue hecha pero no se recibió respuesta
+      console.error("Error request:", error.request);
+    } else {
+      // Algo sucedió al configurar la solicitud
+      console.error("Error message:", error.message);
+    }
+    throw new Error("Error al obtener el tipo de cambio");
+  }
+};

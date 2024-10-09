@@ -1,5 +1,9 @@
 import { Schema, model, Types } from "mongoose";
-import { getCovertExchangePair } from "../functions/fetchs.js";
+import {
+  getCovertExchangePair,
+  getDolarRateDolarApi,
+  getEuroRateDolarApi,
+} from "../functions/fetchs.js";
 
 const MaterialSchema = new Schema(
   {
@@ -71,7 +75,8 @@ const MaterialSchema = new Schema(
           precioEnEuros: Number,
           valorDolar: Number,
           valorEuro: Number,
-          fechaCotizaciones: Date,
+          fechaCotizacionDolar: Date,
+          fechaCotizacionEuro: Date,
           precioEnDolares: Number,
         },
       ],
@@ -91,47 +96,62 @@ MaterialSchema.pre("save", async function (next) {
       return next();
     }
 
-    let valorDolarHoy = await getCovertExchangePair("USD", "ARS");
-    let valorEuroHoy = await getCovertExchangePair("EUR", "ARS");
+    // let valorDolarHoy = await getCovertExchangePair("USD", "ARS");
+    // let valorEuroHoy = await getCovertExchangePair("EUR", "ARS");
+    let valorEuroHoy2 = await getEuroRateDolarApi();
+    let { dolarBlue, dolarOficial } = await getDolarRateDolarApi();
+    console.log("preio EURO DENTRO DEL PRESAVE");
+    console.log(valorEuroHoy2);
+    console.log(dolarOficial);
 
     // Prepara la entrada de historial
     const newPriceEntry = {
       precio: this.precio,
       fecha: Date.now(),
       moneda: this.moneda,
-      valorDolar: valorDolarHoy.tipo_cambio,
-      valorEuro: valorEuroHoy.tipo_cambio,
-      fechaCotizaciones: valorDolarHoy.lastUpdate,
+      // valorDolar: valorDolarHoy.tipo_cambio,
+      valorDolar: dolarOficial.venta,
+      // valorEuro: valorEuroHoy.tipo_cambio,
+      valorEuro: valorEuroHoy2.euroOficial.venta,
+      fechaCotizacionDolar: dolarOficial.fechaActualizacion,
+      fechaCotizacionEuro: valorEuroHoy2.euroOficial.fechaActualizacion,
     };
 
     // Calcular precios en diferentes monedas
     if (this.moneda === "USD") {
-      const { tipo_cambio: tipoCambioUSDAPesos } = await getCovertExchangePair(
-        "USD",
-        "ARS"
-      );
-      this.precioEnPesos = this.precio * tipoCambioUSDAPesos;
+      // const { tipo_cambio: tipoCambioUSDAPesos } = await getCovertExchangePair(
+      //   "USD",
+      //   "ARS"
+      // );
+      // this.precioEnPesos = this.precio * tipoCambioUSDAPesos;
+      this.precioEnPesos = this.precio * dolarOficial.venta;
       this.precioEnDolares = this.precio;
-      this.precioEnEuros =
-        this.precio * (await getCovertExchangePair("USD", "EUR")).tipo_cambio;
+      // this.precioEnEuros =
+      //   this.precio * (await getCovertExchangePair("USD", "EUR")).tipo_cambio;
+      this.precioEnEuros = this.precio * valorEuroHoy2.euroOficial.venta;
     } else if (this.moneda === "EUR") {
-      const { tipo_cambio: tipoCambioEURAPesos } = await getCovertExchangePair(
-        "EUR",
-        "ARS"
-      );
-      this.precioEnPesos = this.precio * tipoCambioEURAPesos;
+      // const { tipo_cambio: tipoCambioEURAPesos } = await getCovertExchangePair(
+      //   "EUR",
+      //   "ARS"
+      // );
+      // this.precioEnPesos = this.precio * tipoCambioEURAPesos;
+      this.precioEnPesos = this.precio * valorEuroHoy2.euroOficial.venta;
+      // this.precioEnDolares =
+      //   this.precio * (await getCovertExchangePair("EUR", "USD")).tipo_cambio;
       this.precioEnDolares =
-        this.precio * (await getCovertExchangePair("EUR", "USD")).tipo_cambio;
+        (this.precio * valorEuroHoy2.euroOficial.venta) / dolarOficial.venta;
       this.precioEnEuros = this.precio;
     } else if (this.moneda === "ARS") {
-      const { tipo_cambio: tipoCambioUSDAPesos } = await getCovertExchangePair(
-        "USD",
-        "ARS"
-      );
+      // const { tipo_cambio: tipoCambioUSDAPesos } = await getCovertExchangePair(
+      //   "USD",
+      //   "ARS"
+      // );
       this.precioEnPesos = this.precio;
-      this.precioEnDolares = this.precio / tipoCambioUSDAPesos;
-      this.precioEnEuros =
-        this.precio / (await getCovertExchangePair("EUR", "ARS")).tipo_cambio;
+      // this.precioEnDolares = this.precio / tipoCambioUSDAPesos;
+      this.precioEnDolares = this.precio / dolarOficial.venta;
+      // this.precioEnEuros =
+      //   this.precio / (await getCovertExchangePair("EUR", "ARS")).tipo_cambio;
+      this.precioEnEuros = this.precio / valorEuroHoy2.euroOficial.venta;
     }
 
     // Asignar los precios calculados al objeto actual
