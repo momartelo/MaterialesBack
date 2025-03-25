@@ -138,6 +138,7 @@ export const ctrlGetMaterial = async (req, res) => {
 // };
 
 export const ctrlUpdateMaterial = async (req, res) => {
+  console.log("Hola estoy dentro del update");
   const { materialId } = req.params;
   const userId = req.user._id;
 

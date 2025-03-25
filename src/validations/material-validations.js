@@ -4,8 +4,8 @@ import { applyValidations } from "../middlewares/apply-validations.js";
 import { MaterialModel } from "../models/Material.js";
 
 export const createMaterialValidations = [
-  body("image") 
-  .optional()
+  body("image")
+    .optional()
     .isString()
     .withMessage("El campo { image } debe ser un string"),
   body("name")
@@ -55,11 +55,11 @@ export const updateMaterialValidations = [
     .withMessage("El parametro { materialId } debe ser un string.")
     .custom(isValidObjectId)
     .withMessage("El parametro { materialId } debe ser una id valida."),
-    body("image") 
+  body("image")
     .optional()
     .isString()
     .withMessage("El campo { image } debe ser un string"),
-    body("name")
+  body("name")
     .optional()
     .isString()
     .withMessage("El parametro { name } debe ser un string.")
@@ -71,7 +71,7 @@ export const updateMaterialValidations = [
         }
       }
       return true;
-    }),  
+    }),
   body("precio")
     .optional()
     .isFloat()

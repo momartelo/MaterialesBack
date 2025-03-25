@@ -39,7 +39,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 export const publicPath = path.join(__dirname, "src", "public");
 app.use(express.static(publicPath));
-console.log(publicPath);
+console.log("Public Path", publicPath);
 
 //---------Rutas api-----------//
 app.use("/api/auth", authRouter);
